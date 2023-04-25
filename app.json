@@ -25,6 +25,88 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "android": {
+          "package": "com.yourcompany.yourappname",
+          "versionCode": 1,
+          "config": {
+            "googleMaps": {
+              "apiKey": "AIzaSyB1koK7KQe0YzwScTNjC7lHRSi7my056bk"
+            }
+          }
+        }
   }
 }
+
+
+// {
+//   "expo": {
+//     "name": "cholo_jai",
+//     "slug": "cholo_jai",
+//     "version": "1.0.0",
+//     "orientation": "portrait",
+//     "icon": "./assets/icon.png",
+//     "userInterfaceStyle": "light",
+//     "splash": {
+//       "image": "./assets/splash.png",
+//       "resizeMode": "contain",
+//       "backgroundColor": "#ffffff"
+//     },
+//     "assetBundlePatterns": [
+//       "**/*"
+//     ],
+//     "ios": {
+//       "supportsTablet": true
+//     },
+//     "android": {
+//       "adaptiveIcon": {
+//         "foregroundImage": "./assets/adaptive-icon.png",
+//         "backgroundColor": "#ffffff"
+//       },
+//       "permissions": [
+//         "ACCESS_COARSE_LOCATION",
+//         "ACCESS_FINE_LOCATION"
+//       ]
+//     },
+//     "web": {
+//       "favicon": "./assets/favicon.png"
+//     },
+//     "androidNavigationBar": {
+//       "backgroundColor": "#000000"
+//     },
+//     "androidStatusBar": {
+//       "backgroundColor": "#000000",
+//       "barStyle": "light-content"
+//     },
+//     "plugins": [
+//       [
+//         "expo-branch",
+//         {
+//           "branchKey": "<your-branch-key>"
+//         }
+//       ]
+//     ],
+//     "sdkVersion": "42.0.0",
+//     "androidUsesAndroidX": true,
+//     "androidGoogleServicesFile": "./google-services.json",
+//     "packagerOpts": {
+//       "sourceExts": [
+//         "expo.js",
+//         "js",
+//         "ts",
+//         "tsx",
+//         "json",
+//         "jsx"
+//       ]
+//     }
+//   },
+//   "android": {
+//     "package": "com.yourcompany.yourappname",
+//     "versionCode": 1,
+//     "config": {
+//       "googleMaps": {
+//         "apiKey": "AIzaSyB1koK7KQe0YzwScTNjC7lHRSi7my056bk"
+//       }
+//     }
+//   }
+// }
