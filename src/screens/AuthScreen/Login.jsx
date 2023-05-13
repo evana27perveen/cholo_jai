@@ -101,15 +101,14 @@ const Login = () => {
           setGroup("group", jsonResponse.group)
 
 
-          if (jsonResponse.group === 'CUSTOMER'){
-            if(jsonResponse.profile === "True") {
+          if (jsonResponse.profile === "True"){
+            if(jsonResponse.group === 'CUSTOMER') {
               navigation.navigate('Home');
             }
-            else {
-              navigation.navigate('Profile');
-            }
           }
-          
+          else {
+              navigation.navigate('Profile');
+          }
           
         } catch (error) {
           console.log('Error:', error);
