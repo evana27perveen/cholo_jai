@@ -82,8 +82,6 @@ class ProfileModel(models.Model):
     profile_picture = models.ImageField(
         blank=True, null=True, upload_to='profile_pic/')
     date_joined = models.DateTimeField(auto_now=True)
-    auth_token = models.CharField(max_length=100, blank=True)
-    is_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.full_name}'s Profile"

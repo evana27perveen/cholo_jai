@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AsyncStorage } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -49,7 +49,9 @@ const SignUp = () => {
 
 
   const handleSignUp = async (e) => {
+
     e.preventDefault();
+
     // Validate email
     if (!email) {
       console.error('Email is required');
@@ -78,27 +80,35 @@ const SignUp = () => {
       return;
     }
 
-    let formData = new FormData();
+  let formData = new FormData();
 
-    formData.append("email", email)
-    formData.append("password", password)
-    formData.append("group", group)
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("group", group);
 
-    let requestOption = {
-      method: "POST",
-      body: formData,
-      redirect: "follow"
-    }
-  
-    fetch('http://192.168.153.251:8000/auth/register/', requestOption)
-    .then(response => response.json())
-    .then(response => {
-           console.log('success', response);
-      navigation.navigate('Login');
-    })
-    .catch(error => console.log('Error:', error));
+  let requestOption = {
+    method: "POST",
+    body: formData,
+    redirect: "follow"
   };
-  
+
+  try {
+    const response = await fetch('http://192.168.0.106:8000/auth/register/', requestOption);
+    const responseData = await response.text();
+    const jsonResponse = JSON.parse(responseData);
+
+    console.log('success', jsonResponse);
+    navigation.navigate('Login');
+  } catch (error) {
+    console.log('Error:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'An error occurred while signing up. Please try again later.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -134,11 +144,17 @@ const SignUp = () => {
     title="Sign Up"
     onPress={handleSignUp}
     disabled={!email || !password || !confirmPassword}
+    color="#FECE00"
     accessibilityLabel="Sign up button"
   >
-    <Text style={styles.buttonText}>Sign Up</Text>
   </Button>
 </View>
+
+<Text style={{ marginTop: 16 }}>Already have an account? 
+  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+    <Text style={{ color: '#d4851d' }}> Login here</Text>
+  </TouchableOpacity>
+</Text>
 
 </View>
 );

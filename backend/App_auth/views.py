@@ -16,6 +16,11 @@ import json
 
 from App_auth.serializers import RegisterSerializer
 
+from django.core import serializers
+
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+
 
 # Create your views here.
 class RegisterAPIView(CreateAPIView):
@@ -78,49 +83,77 @@ class UserLoginView(TokenObtainPairView):
             refreshToken = RefreshToken.for_user(user)
             grp = groups = Group.objects.filter(user=user)
             group_names = [group.name for group in groups][0]
+            profile = ProfileModel.objects.get(user=user)
+            if profile.phone_number is None:
+                profile_status = False
+            else:
+                profile_status = True
 
-            return Response({'refreshToken': str(refreshToken), 'accessToken': str(refreshToken.access_token),
-                             'alert': 'Login Success', 'group': group_names },
-                            status=status.HTTP_200_OK)
+            return Response({
+                'refreshToken': str(refreshToken),
+                'accessToken': str(refreshToken.access_token),
+                'alert': 'Login Success',
+                'group': group_names,
+                'profile': str(profile_status)
+            }, status=status.HTTP_200_OK)
         else:
             return Response({"alert": "Failed!"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class UserProfileModelAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated, ]
-    # queryset = ProfileModel.objects.all()
-    serializer_class = ProfileModelSerializer
 
-    def get(self, request, *args, **kwargs):
-        queryset = ProfileModel.objects.get(user=request.user)
-        serializer = self.get_serializer(queryset)
-        return Response(serializer.data)
+class UserProfileModelAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request, format=None, **kwargs):
-        serializer = ProfileModelSerializer(data=request.data, context={'user': request.user})
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'alert': 'Profile set.'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # def put()
-
-
-@api_view(['POST'])
-# @permission_classes(['IsAuthenticated'])
-def profile_update_api_view(request):
-    if request.method == 'POST':
-        profile = ProfileModel.objects.get(user=request.user)
-        profile.full_name = request.data['full_name']
-        profile.phone_number = request.data['phone_number']
+    def get_object(self, user):
         try:
-            profile.profile_picture = request.FILES['profile_picture']
-        except:
-            print("File not Found")
-        profile.house = request.data['house']
-        profile.area = request.data['area']
-        profile.city = request.data['city']
-        profile.save()
+            return ProfileModel.objects.get(user=user)
+        except ProfileModel.DoesNotExist:
+            return None
 
-        return Response({"success": "Successfully Updated!!!"})
-    return Response({"error": "Update failed"})
+    def get(self, request, format=None):
+        profile = self.get_object(request.user)
+        if profile is not None:
+            serializer = ProfileModelSerializer(profile)
+            return Response(serializer.data)
+        else:
+            return Response({"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, format=None):
+        user = request.user
+        profile = self.get_object(user)
+        data = request.data.copy()
+        data["user"] = user.id
+        if profile is not None:
+            serializer = ProfileModelSerializer(profile, data=data)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = ProfileModelSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save(user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# @api_view(['POST'])
+# # @permission_classes(['IsAuthenticated'])
+# def profile_update_api_view(request):
+#     if request.method == 'POST':
+#         profile = ProfileModel.objects.get(user=request.user)
+#         profile.full_name = request.data['full_name']
+#         profile.phone_number = request.data['phone_number']
+#         try:
+#             profile.profile_picture = request.FILES['profile_picture']
+#         except:
+#             print("File not Found")
+#         profile.save()
+
+#         return Response({"success": "Successfully Updated!!!"})
+#     return Response({"error": "Update failed"})

@@ -9,6 +9,7 @@ import DestinationSearch from './src/screens/SearchScreen/DestinationSearch';
 import RideSearch from './src/screens/FindRideScreen/RideSearch';
 import SignUp from './src/screens/AuthScreen/SignUp';
 import Login from './src/screens/AuthScreen/Login';
+import Profile from './src/screens/AuthScreen/Profile';
 
 const Stack = createStackNavigator();
 
@@ -20,9 +21,10 @@ export default function App() {
     <>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="SignUp">
+        <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
           <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+          <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
           <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
           <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
           <Stack.Screen name="DestinationSearch" component={DestinationSearch} options={{ headerShown: false }} />

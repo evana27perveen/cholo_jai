@@ -1,7 +1,105 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { AsyncStorage } from 'react-native';
+import { View, TextInput, Button, Image, StyleSheet, Text } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { useCookies } from 'react-cookie';
 import { useNavigation } from '@react-navigation/native';
+
+const Profile = () => {
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [token] = useCookies(['myToken']);
+  const [group] = useCookies(['myGroup']);
+  const navigation = useNavigation();
+
+  const handleProfilePictureUpload = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      const { uri } = result.assets[0];
+      setProfilePicture(uri);
+    }
+  };
+
+  const handleSubmit = async () => {
+
+    const data = new FormData();
+    data.append('full_name', fullName);
+    data.append('phone_number', phoneNumber);
+    // if (profilePicture) {
+    //   const localUri = await fetch(profilePicture);
+    //   const filename = profilePicture.split('/').pop();
+    //   const match = /\.(\w+)$/.exec(filename);
+    //   const type = match ? `image/${match[1]}` : 'image';
+    //   data.append('profile_picture', { uri: localUri, name: filename, type });
+    // }
+
+
+
+    try {
+      const response = await fetch('http://192.168.0.106:8000/auth/profile-view/', {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token.access_token}`,
+        },
+        body: data,
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+      console.log(token.group);
+
+      if (token.group === 'CUSTOMER'){
+        navigation.navigate('Home');
+      }
+
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Profile</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Full Name"
+        value={fullName}
+        onChangeText={setFullName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+      />
+      {/* <View style={styles.uploadContainer}>
+        {profilePicture && (
+          <Image source={{ uri: profilePicture }} style={styles.image} />
+        )}
+        <Button
+          title="Upload Profile Picture"
+          onPress={handleProfilePictureUpload}
+          color="#6d6b19"
+        />
+      </View> */}
+      <Button 
+      style={{ width: '80%', borderRadius: 5, }}
+      title="Submit" 
+      disabled={!fullName || !phoneNumber}
+      onPress={handleSubmit}
+      color="#FECE00" />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -15,177 +113,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 24,
   },
-  inputContainer: {
-    width: '80%',
-  },
   input: {
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#030303',
     marginBottom: 16,
     padding: 8,
     fontSize: 16,
+    width: '80%',
   },
-  button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 16,
+  uploadContainer: {
     alignItems: 'center',
+    margin: 8,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  image: {
+    width: 200,
+    height: 200,
+    marginVertical: 8,
   },
+  
 });
-
-const Profile = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const navigation = useNavigation();
-
-  const handleSignUp = async () => {
-    // Validate first name
-    if (!firstName) {
-      console.error('First name is required');
-      return;
-    }
-
-    // Validate last name
-    if (!lastName) {
-      console.error('Last name is required');
-      return;
-    }
-
-    // Validate email
-    if (!email) {
-      console.error('Email is required');
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      console.error('Invalid email');
-      return;
-    }
-
-    // Validate phone number
-    if (!phoneNumber) {
-        console.error('Phone number is required');
-        return;
-      }
-      
-      if (!/^(\+8801)[3-9]\d{8}$/.test(phoneNumber)) {
-        console.error('Invalid phone number');
-        return;
-      }
-
-    // Validate password
-    if (!password) {
-      console.error('Password is required');
-      return;
-    }
-
-    if (password.length < 8) {
-      console.error('Password must be at least 8 characters long');
-      return;
-    }
-
-    // Validate confirm password
-    if (confirmPassword !== password) {
-      console.error('Passwords do not match');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://your-django-api-url.com/api/signup/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          email,
-          phone_number: phoneNumber,
-          password,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const accessToken = data.access_token;
-        await AsyncStorage.setItem('access_token', accessToken);
-        Alert.alert('You have successfully signed up!');
-        navigation.navigate('Home');
-        // Handle successful sign-up
-      } else {
-        console.error('Wrong Token');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-<View style={styles.inputContainer}>
-<TextInput
-       style={styles.input}
-       placeholder="First Name"
-       onChangeText={setFirstName}
-       value={firstName}
-     />
-<TextInput
-       style={styles.input}
-       placeholder="Last Name"
-       onChangeText={setLastName}
-       value={lastName}
-     />
-<TextInput
-       style={styles.input}
-       placeholder="Email"
-       keyboardType="email-address"
-       onChangeText={setEmail}
-       value={email}
-     />
-<TextInput
-       style={styles.input}
-       placeholder="Phone Number"
-       keyboardType="phone-pad"
-       onChangeText={setPhoneNumber}
-       value={phoneNumber}
-     />
-<TextInput
-       style={styles.input}
-       placeholder="Password"
-       secureTextEntry
-       onChangeText={setPassword}
-       value={password}
-     />
-<TextInput
-       style={styles.input}
-       placeholder="Confirm Password"
-       secureTextEntry
-       onChangeText={setConfirmPassword}
-       value={confirmPassword}
-     />
-</View>
-<Button
-title="Sign Up"
-onPress={handleSignUp}
-disabled={!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword}
-style={styles.button}
-accessibilityLabel="Sign up button"
->
-<Text style={styles.buttonText}>Sign Up</Text>
-</Button>
-</View>
-);
-};
 
 export default Profile;

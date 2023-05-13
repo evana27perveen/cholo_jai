@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AsyncStorage } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCookies } from 'react-cookie';
+
+import * as Swal from 'sweetalert2';
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -21,7 +25,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#030303',
     marginBottom: 16,
     padding: 8,
     fontSize: 16,
@@ -73,29 +77,48 @@ const Login = () => {
           return;
         }
 
-        fetch('http://127.0.0.1:8000/auth/login/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              'email': email,
-              'password': password,
-            })
-          })
-          .then(response => response.json())
-          .then(response => {
-            Swal.fire(
-              'Great',
-              response['success'],
-              'success'
-            );
-            setToken('myToken', response['token']['access']);
-            setGroup('myGroup', response['group']);
-            navigation.navigate('Home');
-          })
-          .catch(error => console.log(error));
-  };
+        let formData = new FormData();
+
+        formData.append("email", email);
+        formData.append("password", password);
+
+        let requestOption = {
+          method: "POST",
+          body: formData,
+          redirect: "follow"
+        };
+
+        try {
+          const response = await fetch(
+            'http://192.168.0.106:8000/auth/login/',
+            requestOption
+          );
+          const responseData = await response.text();
+          const jsonResponse = JSON.parse(responseData);
+    
+          console.log('success', jsonResponse);
+          setToken("access_token", jsonResponse.accessToken)
+          setGroup("group", jsonResponse.group)
+
+
+          if (jsonResponse.group === 'CUSTOMER'){
+            if(jsonResponse.profile === "True") {
+              navigation.navigate('Home');
+            }
+            else {
+              navigation.navigate('Profile');
+            }
+          }
+          
+          
+        } catch (error) {
+          console.log('Error:', error);
+          navigation.navigate('Login');
+
+        }
+      };
+
+
 
   return (
     <View style={styles.container}>
@@ -119,15 +142,23 @@ const Login = () => {
        value={password}
      />
 </View>
-<Button
-title="Login"
-onPress={handleSignUp}
-disabled={!email || !password}
-style={styles.button}
-accessibilityLabel="Sign up button"
->
-<Text style={styles.buttonText}>Sign Up</Text>
-</Button>
+<View style={{ width: '80%', borderRadius: 5, }}>
+  <Button
+    title="Login"
+    onPress={handleSignUp}
+    disabled={!email || !password}
+    color="#FECE00"
+    accessibilityLabel="Login button"
+  >
+    
+  </Button>
+
+  <Text style={{ marginTop: 16 }}>Don't have an account? 
+  <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+    <Text style={{ color: '#d4851d' }}> Signup here</Text>
+  </TouchableOpacity>
+</Text>
+</View>
 </View>
 );
 };

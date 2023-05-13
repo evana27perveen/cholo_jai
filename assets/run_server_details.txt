@@ -1,0 +1,9 @@
+
+// Commands
+
+Front-End: React Native
+In VS Code >> terminal >> npx expo start --lan=192.168.0.106 --port=19000
+
+
+Back-End: Django Rest Framework
+In VS Code >> terminal >> python manage.py runserver 192.168.0.106:8000

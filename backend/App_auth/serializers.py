@@ -6,8 +6,27 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import Group
 
+from django.db import transaction
+
+
+
+class ProfileModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileModel
+        fields = '__all__'
+
+    # def create(self, validated_data):
+    #     full_name = validated_data['full_name']
+    #     phone_number = validated_data['phone_number']
+    #     profile_picture = validated_data['profile_picture']
+    #     user = self.context.get('user')
+    #     profile = ProfileModel.objects.create(user=user, full_name=full_name, phone_number=phone_number,
+    #                                           profile_picture=profile_picture)
+    #     return profile
+
 
 class RegisterSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
         fields = ('password', 'email')
@@ -16,6 +35,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
+    @transaction.atomic
     def create(self, validated_data):
         user = CustomUser.objects.create(
             email=validated_data['email']
@@ -25,6 +45,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         grp = Group.objects.get_or_create(name=group_l)
         user.save()
         grp[0].user_set.add(user)
+
+        profile = ProfileModel.objects.create(user=user)
+        profile.save()
+
         return user
 
 
@@ -48,17 +72,3 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ['email', 'password']
 
 
-class ProfileModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileModel
-        fields = '__all__'
-        read_only_fields = ['user']
-
-    def create(self, validated_data):
-        full_name = validated_data['full_name']
-        phone_number = validated_data['phone_number']
-        profile_picture = validated_data['profile_picture']
-        user = self.context.get('user')
-        profile = ProfileModel.objects.create(user=user, full_name=full_name, phone_number=phone_number,
-                                              profile_picture=profile_picture)
-        return profile
