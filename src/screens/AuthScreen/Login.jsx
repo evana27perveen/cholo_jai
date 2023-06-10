@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { AsyncStorage } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCookies } from 'react-cookie';
 

@@ -7,6 +7,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import Group
 
 from django.db import transaction
+from App_location.models import *
 
 
 
@@ -48,6 +49,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         profile = ProfileModel.objects.create(user=user)
         profile.save()
+        
+        current_location = CurrentLocationModel.objects.create(user=user)
+        current_location.save()
 
         return user
 

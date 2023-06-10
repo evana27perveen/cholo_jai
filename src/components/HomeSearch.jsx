@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useCookies } from 'react-cookie';
 
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 
@@ -54,8 +56,13 @@ const styles = StyleSheet.create({
 
 
 function HomeSearch() {
+
+  const navigation = useNavigation();
+
+
   return (
     <View>
+      <TouchableOpacity onPress={() => navigation.navigate('DestinationSearch')}>
         <View style={styles.inputBox}>
           <Text style={styles.inputText}>Where To?</Text>
           <View style={styles.timeContainer}>
@@ -64,21 +71,25 @@ function HomeSearch() {
             <MaterialIcons name={"keyboard-arrow-down"} size={16}/>
           </View>
         </View>
+        </TouchableOpacity>
 
 
         <View style={styles.row}>
           <View style={styles.iconContainer}>
           <AntDesign name={"clockcircle"} size={20} color={'#ffffff'}/>
           </View>
-          <Text style={styles.destinationText}>Spin Nightclub</Text>
+          <Text style={styles.destinationText}>Travel History</Text>
         </View>
 
-        <View style={styles.row}>
-          <View style={[styles.iconContainer, {backgroundColor: '#218cff'}]}>
-          <Entypo name={"home"} size={20} color={'#ffffff'}/>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <View style={styles.row}>
+            <View style={[styles.iconContainer, {backgroundColor: '#218cff'}]}>
+            <Ionicons name={"refresh"} size={20} color={'#ffffff'}/>
+            </View>
+            <Text style={styles.destinationText}>Refresh</Text>
           </View>
-          <Text style={styles.destinationText}>Home</Text>
-        </View>
+        </TouchableOpacity>
+        
     </View>
   )
 }
