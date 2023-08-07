@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
+import { useNavigation } from '@react-navigation/native';
 import {
   StyleSheet,
   Text,
@@ -11,15 +13,22 @@ import {
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import API_BASE_URL from '../../apiConfig';
 
 export default function DestinationMap() {
+
+  const [token] = useCookies(['myToken']);
+
+  const navigation = useNavigation();
+
   const [address, setAddress] = useState('');
+  const [userAddress, setUserAddress] = useState(null);
   const [location, setLocation] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [distance, setDistance] = useState(null);
 
   const [showButton, setShowButton] = useState(false);
-  // const [directions, setDirections] = useState([]);
+  const [cost, setCost] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -45,6 +54,28 @@ export default function DestinationMap() {
       let location = await Location.getCurrentPositionAsync({});
       setUserLocation(location.coords);
       setShowButton(true);
+      try {
+        let reverseGeocode = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+  
+        // Create a formatted address string from the reverse geocode results
+        let formattedAddress = '';
+        const components = [
+          reverseGeocode[0].street,
+          reverseGeocode[0].city,
+          reverseGeocode[0].region,
+          reverseGeocode[0].postalCode,
+          reverseGeocode[0].country,
+        ];
+        const UA = components.filter((component) => component !== null).join(', ');
+  
+        // Update the user's address state
+        setUserAddress(UA);
+      } catch (error) {
+        console.error('Error fetching user address:', error);
+      }
     })();
   }, []);
 
@@ -58,7 +89,7 @@ export default function DestinationMap() {
 
   const calculateDistance = () => {
     if (userLocation && location) {
-      const R = 6371; // Radius of the earth in km
+      const R = 6371;
       const dLat = deg2rad(location.latitude - userLocation.latitude);
       const dLon = deg2rad(location.longitude - userLocation.longitude);
       const a =
@@ -68,22 +99,66 @@ export default function DestinationMap() {
           Math.sin(dLon / 2) *
           Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c; // Distance in km
-      setDistance(distance);
-      console.log('distance:', distance);
-      // setShowButton(false);
-
-      // let directions = [
-      //   { latitude: userLocation.latitude, longitude: userLocation.longitude },
-      //   { latitude: location.latitude, longitude: location.longitude },
-      // ];
-      // setDirections(directions);
+      const distance = R * c; 
+      const baseFare = 80;
+      const additionalFarePerKilometer = 40;
+      let fare = baseFare;
+          if (distance > 2) {
+            const additionalDistance = distance - 2;
+            fare = (fare*2) + (additionalDistance * additionalFarePerKilometer);
+          }
+          else {
+            fare = distance * baseFare;
+          }
+      const price = fare
+      setDistance(distance.toFixed(2));
+      setCost(price.toFixed(2));
     }
   };
 
   const deg2rad = (deg) => {
     return deg * (Math.PI / 180);
   };
+
+  const handleSubmit = async () => {
+    if (distance && cost && location) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/location/rides/`, {
+          method: 'POST',
+          headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.access_token}`,
+          },
+          body: JSON.stringify({
+            user_cords_lat: userLocation.latitude,
+            user_cords_long: userLocation.longitude,
+            loc_cords_lat: location.latitude,
+            loc_cords_long: location.longitude,
+            user_location: userAddress, 
+            destination_location: address,
+            distance: parseFloat(distance),
+            cost: parseFloat(cost),
+            status: 'Requested',
+          }),
+        });
+
+        const jsonResponse = await response.json();
+        const data = jsonResponse.data
+
+      if (response.ok) {
+          
+          console.log('Ride created successfully');
+          navigation.navigate('RideRequest', { rideID: data.id });
+        } else {
+          console.log('Error creating ride');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -96,9 +171,9 @@ export default function DestinationMap() {
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={handlePress}
+          onPress={calculateDistance}
         >
-          <Text style={styles.buttonText}>Map</Text>
+          <Text style={styles.buttonText}>Done</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.mapContainer}>
@@ -153,36 +228,30 @@ export default function DestinationMap() {
         }}
         anchor={{ x: 0.5, y: 1 }}
         ><Image
-            source={require('../../../assets/images/desticon.png')}
+            source={require('../../../assets/images/desticon.gif')}
             
-            style={{ width: 35, height: 33, resizeMode: 'contain' }}
+            style={{ width: 39, height: 35, resizeMode: 'contain' }}
             />
         </Marker>
-        {/* {directions.length > 0 && (
-            <Polyline
-              coordinates={directions}
-              strokeColor="#000"
-              strokeWidth={2}
-            />
-          )} */}
+        
         </MapView>
         )}
         {distance && (
-        <Text style={styles.distanceText}>
-        Distance: {distance.toFixed(2)} km
+          <View>
+          <Text style={styles.distanceText}>
+        Distance: {distance} km & Price: {cost}
         </Text>
-        )}
-
-    {showButton && (
-            <View style={{marginTop: 10}}>
-              <Button
+          <Button
                 style={{ opacity: 0 }}
                 color='#608bad'
-                onPress={calculateDistance}
-                title='Calculate Distance'
+                onPress={handleSubmit}
+                title='Request for a ride'
               />
-            </View>
-                  )}
+              
+          </View>
+        )}
+
+    
     </View>
     </SafeAreaView>
     );
@@ -211,7 +280,7 @@ marginRight: 10,
 backgroundColor: '#fff',
 },
 button: {
-backgroundColor: '#2196F3',
+backgroundColor: '#608bad',
 paddingVertical: 10,
 paddingHorizontal: 15,
 borderRadius: 10,
@@ -229,11 +298,10 @@ borderRadius: 15,
 },
 map: {
 width: '100%',
-height: 500,
+height: 450,
 
 },
 distanceText: {
-position: 'absolute',
 bottom: 20,
 backgroundColor: '#fff',
 padding: 10,

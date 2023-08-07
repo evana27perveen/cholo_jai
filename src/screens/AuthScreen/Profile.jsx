@@ -3,6 +3,7 @@ import { View, TextInput, Button, Image, StyleSheet, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useCookies } from 'react-cookie';
 import { useNavigation } from '@react-navigation/native';
+import API_BASE_URL from '../../apiConfig';
 
 const Profile = () => {
   const [fullName, setFullName] = useState('');
@@ -11,38 +12,19 @@ const Profile = () => {
   const [token] = useCookies(['myToken']);
   const [group] = useCookies(['myGroup']);
   const navigation = useNavigation();
+  console.log(token);
 
-  const handleProfilePictureUpload = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      const { uri } = result.assets[0];
-      setProfilePicture(uri);
-    }
-  };
 
   const handleSubmit = async () => {
 
     const data = new FormData();
     data.append('full_name', fullName);
     data.append('phone_number', phoneNumber);
-    // if (profilePicture) {
-    //   const localUri = await fetch(profilePicture);
-    //   const filename = profilePicture.split('/').pop();
-    //   const match = /\.(\w+)$/.exec(filename);
-    //   const type = match ? `image/${match[1]}` : 'image';
-    //   data.append('profile_picture', { uri: localUri, name: filename, type });
-    // }
 
 
 
     try {
-      const response = await fetch('http://192.168.0.106:8000/auth/profile-view/', {
+      const response = await fetch(`${API_BASE_URL}/auth/profile-view/`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
@@ -58,10 +40,8 @@ const Profile = () => {
       if (token.group === 'CUSTOMER'){
         navigation.navigate('Home');
       }
-
-
-
-    } catch (error) {
+    } 
+    catch (error) {
       console.error(error);
     }
   };
@@ -81,16 +61,7 @@ const Profile = () => {
         value={phoneNumber}
         onChangeText={setPhoneNumber}
       />
-      {/* <View style={styles.uploadContainer}>
-        {profilePicture && (
-          <Image source={{ uri: profilePicture }} style={styles.image} />
-        )}
-        <Button
-          title="Upload Profile Picture"
-          onPress={handleProfilePictureUpload}
-          color="#6d6b19"
-        />
-      </View> */}
+      
       <Button 
       style={{ width: '80%', borderRadius: 5, }}
       title="Submit" 

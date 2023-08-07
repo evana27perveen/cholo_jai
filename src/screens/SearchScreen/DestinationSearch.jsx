@@ -1,13 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
-// import HomeMap from '../../components/HomeMap/DestinationMap';
-import CovidMessage from '../../components/HomeMap/CovidMessage';
-import HomeSearch from '../../components/HomeSearch';
-
-import LocationInput from '../../components/HomeMap/LocationInput';
-import CurrentLocation from '../../components/HomeMap/CurrentLocation';
 import DestinationMap from '../../components/HomeMap/DestinationMap';
+
+import NavBar from '../../components/NavBar';
 
 
 
@@ -22,6 +17,13 @@ const styles = StyleSheet.create({
 });
 
 function DestinationSearch(props) {
+
+  const [activeButton, setActiveButton] = useState('destinationSearch');
+  
+  
+  const handleDestinationSearchPress = () => {
+        setActiveButton('destinationSearch');
+      };
   return (
     <>
       <View style={styles.container}>
@@ -30,7 +32,7 @@ function DestinationSearch(props) {
       <DestinationMap/>
       </View>
       </View>
-      
+      <NavBar onDestinationSearchPress={handleDestinationSearchPress} activeButton={activeButton} />
     </>
   )
 }

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, reverseGeocodeAsync } from 'expo-location';
-
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import { useCookies } from 'react-cookie';
 import { useNavigation } from '@react-navigation/native';
-
-
+import API_BASE_URL from '../../apiConfig';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 const styles = StyleSheet.create({
   container: {
@@ -41,11 +38,11 @@ function CurrentLocation() {
   const [address, setAddress] = useState(null);
   const [token] = useCookies(['myToken']);
   const [group] = useCookies(['myGroup']);
-  const [street, setStreet] = useState(' ');
-  const [postalCode, setPostalCode] = useState(' ');
-  const [city, setCity] = useState(' ');
-  const [region, setRegion] = useState(' ');
-  const [country, setCountry] = useState(' ');
+  const [street, setStreet] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [city, setCity] = useState('');
+  const [region, setRegion] = useState('');
+  const [country, setCountry] = useState('');
   
   const navigation = useNavigation();
 
@@ -65,51 +62,47 @@ function CurrentLocation() {
         longitude: location.coords.longitude,
       });
       setAddress(addressResponse[0]);
-      console.log(address);
-      
-        
-          setStreet(address.street);
-        
-        
-          setPostalCode(address.postalCode);
-        
-        
-          setCity(address.city);
-        
-        
-          setRegion(address.region);
-        
-        
-          setCountry(address.country);
-        
-      
-
-      const data = new FormData();
-      data.append('loc_cords_lat', JSON.stringify(location.coords.latitude));
-      data.append('loc_cords_long', JSON.stringify(location.coords.longitude));
-      data.append('loc_street', street);
-      data.append('loc_postalCode', postalCode);
-      data.append('loc_city', city);
-      data.append('loc_region', region);
-      data.append('loc_country', country);
-
-      try {
-        const response = await fetch('http://192.168.0.106:8000/location/current-location/', {
-          method: 'PUT',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token.access_token}`,
-          },
-          body: data,
-        });
-        const responseData = await response.json();
-        console.log(responseData);
-      } catch (error) {
-        console.error(error);
-      }
     })();
-  }, [address]);
+  }, []); // Run this effect only once, on component mount
+
+  useEffect(() => {
+    if (address) {
+      setStreet(address.street || '');
+      setPostalCode(address.postalCode || '');
+      setCity(address.city || '');
+      setRegion(address.region || '');
+      setCountry(address.country || '');
+
+      const updateLocation = async () => {
+        const data = new FormData();
+        data.append('loc_cords_lat', JSON.stringify(location.coords.latitude));
+        data.append('loc_cords_long', JSON.stringify(location.coords.longitude));
+        data.append('loc_street', street);
+        data.append('loc_postalCode', postalCode);
+        data.append('loc_city', city);
+        data.append('loc_region', region);
+        data.append('loc_country', country);
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/location/current-location/`, {
+            method: 'PUT',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token.access_token}`,
+            },
+            body: data,
+          });
+          const responseData = await response.json();
+          console.log(responseData);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      updateLocation(); // Call the async function to update location
+    }
+  }, [address, street, postalCode, city, region, country]);
 
   if (errorMsg) {
     return <Text>{errorMsg}</Text>;
@@ -145,7 +138,7 @@ function CurrentLocation() {
           {address && (
             <>
               <Text style={{ fontWeight: 'bold' }}>Current Location:</Text>
-              <Text>{address.street}, {address.postalCode} {address.city}, {address.region}, {address.country}</Text>
+              <Text>{address.street} {address.postalCode} {address.city}, {address.region}, {address.country}</Text>
             </>
           )}
         </View>

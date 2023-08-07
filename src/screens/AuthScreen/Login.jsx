@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCookies } from 'react-cookie';
+import API_BASE_URL from '../../apiConfig';
 
 import * as Swal from 'sweetalert2';
 
@@ -12,7 +13,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#ffff',
   },
   title: {
     fontSize: 24,
@@ -46,8 +47,9 @@ const styles = StyleSheet.create({
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [token, setToken] = useCookies(['myToken'])
-    const [group, setGroup] = useCookies(['myGroup'])
+    const [token, setToken] = useCookies(['myToken']);
+    const [group, setGroup] = useCookies(['myGroup']);
+    const [profile, setProfile] = useCookies(['myProfile']);
     const navigation = useNavigation();
 
     const handleSignUp = async (e) => {
@@ -57,11 +59,6 @@ const Login = () => {
         // Validate email
         if (!email) {
           console.error('Email is required');
-          return;
-        }
-      
-        if (!/\S+@\S+\.\S+/.test(email)) {
-          console.error('Invalid email');
           return;
         }
       
@@ -89,7 +86,7 @@ const Login = () => {
 
         try {
           const response = await fetch(
-            'http://192.168.0.106:8000/auth/login/',
+            `${API_BASE_URL}/auth/login/`,
             requestOption
           );
           const responseData = await response.text();
@@ -98,16 +95,14 @@ const Login = () => {
           console.log('success', jsonResponse);
           setToken("access_token", jsonResponse.accessToken)
           setGroup("group", jsonResponse.group)
-
-
-          if (jsonResponse.profile === "True"){
-            if(jsonResponse.group === 'CUSTOMER') {
-              navigation.navigate('Home');
-            }
+          setProfile("profile", jsonResponse.profile)
+          if (jsonResponse.profile === "False") {
+            navigation.navigate('Profile');
           }
           else {
-              navigation.navigate('Profile');
+            navigation.navigate('Home');
           }
+          
           
         } catch (error) {
           console.log('Error:', error);
@@ -120,8 +115,8 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-        <Image source={require('../../../assets/images/SUlogo.png')}
-        style={{ width: 400, height: 200, resizeMode: 'contain' }}/>
+        <Image source={require('../../../assets/images/logoC.png')}
+        style={{ width: 400, height: 300, resizeMode: 'contain' }}/>
       <Text style={styles.title}>Login</Text>
 <View style={styles.inputContainer}>
 <TextInput
@@ -140,7 +135,7 @@ const Login = () => {
        value={password}
      />
 </View>
-<View style={{ width: '80%', borderRadius: 5, }}>
+<View style={{ width: '80%', borderRadius: 5,}}>
   <Button
     title="Login"
     onPress={handleSignUp}

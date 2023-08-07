@@ -96,3 +96,15 @@ class ProfileModel(models.Model):
             if value is None or value == '':
                 return False
         return True
+
+
+class DriverModel(models.Model):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name='driver')
+    full_name = models.CharField(max_length=264, blank=True, null=True)
+    phone_number = models.CharField(validators=[phone_regex], verbose_name=_("Mobile phone"), max_length=17,
+                                    blank=True, null=True)
+    date_joined = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.full_name}'s Profile"

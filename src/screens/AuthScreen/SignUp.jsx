@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import Swal from 'sweetalert2';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { AsyncStorage } from 'react-native';
+import API_BASE_URL from '../../apiConfig';
 import { useNavigation } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
@@ -93,7 +92,7 @@ const SignUp = () => {
   };
 
   try {
-    const response = await fetch('http://192.168.0.106:8000/auth/register/', requestOption);
+    const response = await fetch(`${API_BASE_URL}/auth/register/`, requestOption);
     const responseData = await response.text();
     const jsonResponse = JSON.parse(responseData);
 
@@ -101,19 +100,13 @@ const SignUp = () => {
     navigation.navigate('Login');
   } catch (error) {
     console.log('Error:', error);
-    Swal.fire({
-      title: 'Error',
-      text: 'An error occurred while signing up. Please try again later.',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
   }
 };
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../../assets/images/SUlogo.png')}
-        style={{ width: 400, height: 200, resizeMode: 'contain' }}/>
+      <Image source={require('../../../assets/images/logoC.png')}
+        style={{ width: 400, height: 300, resizeMode: 'contain' }}/>
       <Text style={styles.title}>Sign Up</Text>
 <View style={styles.inputContainer}>
 

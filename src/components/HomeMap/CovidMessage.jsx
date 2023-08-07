@@ -5,10 +5,10 @@ const styles = StyleSheet.create({
     container: {
       backgroundColor: '#84a5da',
       padding: 10,
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-      borderBottomLeftRadius: 10,
-      borderBottomRightRadius: 10,
+      borderTopLeftRadius: 7,
+      borderTopRightRadius: 7,
+      borderBottomLeftRadius: 7,
+      borderBottomRightRadius: 7,
     },
     title: {
         color: 'white',
@@ -34,9 +34,9 @@ function CovidMessage() {
   return (
     <View style={styles.container}>
         <Text style={styles.title}>Travel only if necessary</Text>
-        <Text style={styles.text}>Due to the ongoing COVID-19 pandemic, 
-        all non-essential travel is strongly discouraged.</Text>
-        <Text style={styles.learnmMore}>Learn More </Text>
+        <Text style={styles.text}>
+        All non-essential travel is strongly discouraged. 
+        As additional use of petroleum is harmful to our mother nature.</Text>
     </View>
   )
 }

@@ -33,7 +33,7 @@ class RegisterAPIView(CreateAPIView):
             self.perform_create(serializers_)
             return Response(serializers_.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializers_.error, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializers_.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def getToken(user):

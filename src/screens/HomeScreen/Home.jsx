@@ -1,13 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-
-// import HomeMap from '../../components/HomeMap/DestinationMap';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import CovidMessage from '../../components/HomeMap/CovidMessage';
 import HomeSearch from '../../components/HomeSearch';
 
-import LocationInput from '../../components/HomeMap/LocationInput';
 import CurrentLocation from '../../components/HomeMap/CurrentLocation';
-import DestinationMap from '../../components/HomeMap/DestinationMap';
+import NavBar from '../../components/NavBar'
 
 
 
@@ -17,11 +14,21 @@ const styles = StyleSheet.create({
     
   },
   mapContainer: {
-    height: '50%',
+    height: '57%',
   },
 });
 
 function Home(props) {
+  
+  const [activeButton, setActiveButton] = useState('home');
+  
+  
+  const handleHomePress = () => {
+        setActiveButton('home');
+      };
+
+
+
   return (
     <>
       <View style={styles.container}>
@@ -32,7 +39,7 @@ function Home(props) {
       <CovidMessage/>
       <HomeSearch />
       </View>
-      
+      <NavBar onHomePress={handleHomePress} activeButton={activeButton} />
     </>
   )
 }
