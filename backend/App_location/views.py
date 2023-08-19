@@ -1,6 +1,9 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+
+from App_auth.models import DriverModel
 from .models import CurrentLocationModel, RideModel, TransactionModel
 from .serializers import CurrentLocationSerializer, RideModelSerializer, TransactionModelSerializer
 from rest_framework.response import Response
@@ -46,6 +49,7 @@ class RideListCreateView(generics.ListCreateAPIView):
         }
         return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
+
 class RideRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = RideModel.objects.all()
     serializer_class = RideModelSerializer
@@ -74,3 +78,34 @@ class TransactionModelRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         serializer.save()
 
         return Response(serializer.data)
+
+
+class RequestsAPIView(APIView):
+    def get(self, request):
+        requests = RideModel.objects.filter(status='Requested').order_by('-date')
+        serializer = RideModelSerializer(requests, many=True)
+        return Response({"requests": serializer.data})
+
+
+class AcceptsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        ride_id = kwargs['ride_id']
+        user = request.user
+        driver = DriverModel.objects.get(user=user)
+        request_ = RideModel.objects.get(pk=ride_id)
+        request_.status = 'Accepted'
+        request_.driver = driver
+        request_.save()
+        print(request_)
+        return Response(status=status.HTTP_200_OK)
+
+
+class DriverRideListView(generics.ListCreateAPIView):
+    serializer_class = RideModelSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        driver = DriverModel.objects.get(user=self.request.user)
+        return RideModel.objects.filter(driver=driver)

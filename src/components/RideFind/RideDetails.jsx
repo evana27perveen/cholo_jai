@@ -3,7 +3,7 @@ import { useCookies } from 'react-cookie';
 import { useNavigation } from '@react-navigation/native';
 import API_BASE_URL from '../../apiConfig';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import NavBar from '../../components/NavBar';
 import moment from 'moment';
 
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function RideRequest({ route }) {
+function RideDetails({ route }) {
   const { rideID } = route.params;
 
   const [token] = useCookies(['myToken']);
@@ -169,8 +169,8 @@ function RideRequest({ route }) {
 
       if (response.ok) {
         console.log('successfully updated');
-        console.log(jsonResponse);
         setStatus(jsonResponse.status);
+        navigation.navigate('DriverHome');
       } else {
         console.log('Error :', jsonResponse); 
       }
@@ -206,46 +206,18 @@ function RideRequest({ route }) {
                 <Text style={styles.cardTitle}>Request Status : {status}</Text>
               </View>
             </View>
-            {status === 'Accepted' && (
-            <>
-                <Text style={styles.noticeText}>Begin the Ride when the car arrives:</Text>
-                <TouchableOpacity style={styles.cardButton} onPress={() => updateStatus('On Ride')}>
-                    <Text style={styles.iconText}>
-                    <MaterialCommunityIcons name="car-limousine" size={44} color="#fff" />
-                    </Text>
-                    <Text style={styles.buttonText}>Begin The Ride</Text>
-                </TouchableOpacity>
-                        </>
-            )}
-            {status === 'On Ride' && (
-            <>
-                <Text style={styles.noticeText}>Confirm when reach the destination:</Text>
-                <TouchableOpacity style={styles.cardButton} 
-                onPress={
-                    () => {
-                        updateStatus('Completed');
-                        navigation.navigate('Payment', { amount: rideData.cost, rideID: rideID });
-                    }
-                }>
-                    <Text style={styles.iconText}>
-                    <MaterialCommunityIcons name="map-marker-check" size={44} color="#fff" />
-                    </Text>
-                    <Text style={styles.buttonText}>Reached the Destination</Text>
-                </TouchableOpacity>
-                        </>
-            )}
-            {status === 'Requested' && (
+            {status === 'Completed' && (
                 <>
-                  <TouchableOpacity
-                    style={styles.cardButton}
-                    onPress={() => {
-                      updateStatus('Canceled');
-                      navigation.navigate('History');
-                    }}>
-                    <Text style={styles.buttonText}>Cancel</Text>
-                  </TouchableOpacity>
+                    <Text style={styles.noticeText}>Confirm the Payment</Text>
+                    <TouchableOpacity style={styles.cardButton} onPress={() => updateStatus('Payment Done')}>
+                        <Text style={styles.iconText}>
+                        <MaterialIcons name="payment" size={44} color="#fff" />
+                        </Text>
+                        <Text style={styles.buttonText}>Payment Done</Text>
+                    </TouchableOpacity>
                 </>
-              )}
+            )}
+            
           </>
         )}
       </View>
@@ -254,4 +226,4 @@ function RideRequest({ route }) {
   );
 }
 
-export default RideRequest;
+export default RideDetails;

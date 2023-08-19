@@ -43,12 +43,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         group_l = self.context.get('groups')
+        full_name = self.context.get('full_name')
+        phone_number = self.context.get('phone_number')
         grp = Group.objects.get_or_create(name=group_l)
         user.save()
         grp[0].user_set.add(user)
 
-        profile = ProfileModel.objects.create(user=user)
-        profile.save()
+        if group_l == "CUSTOMER":
+            profile = ProfileModel.objects.create(user=user, full_name=full_name, phone_number=phone_number)
+            profile.save()
+        else:
+            profile = DriverModel.objects.create(user=user, full_name=full_name, phone_number=phone_number)
+            profile.save()
         
         current_location = CurrentLocationModel.objects.create(user=user)
         current_location.save()

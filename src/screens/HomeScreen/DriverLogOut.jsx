@@ -8,27 +8,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const styles = StyleSheet.create({
-  inputBox: {
-    backgroundColor: '#e7e7e7',
-    margin: 10,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#434343',
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    width: 100,
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 50,
-  },
+  
   row: {
     backgroundColor: '#84a5da',
     margin: 10,
@@ -50,7 +30,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function HomeSearch() {
+function LogOut() {
   const navigation = useNavigation();
   const [expanded, setExpanded] = useState(false);
   const [animationInProgress, setAnimationInProgress] = useState(false);
@@ -88,17 +68,6 @@ function HomeSearch() {
 
   return (
     <View>
-      <TouchableOpacity onPress={() => navigation.navigate('DestinationSearch')}>
-        <View style={styles.inputBox}>
-          <Text style={styles.inputText}>Where To?</Text>
-          <View style={styles.timeContainer}>
-            <AntDesign name={"clockcircle"} size={16} color={'#535353'}/>
-            <Text>Now</Text>
-            <MaterialIcons name={"keyboard-arrow-down"} size={16}/>
-          </View>
-        </View>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.row} onPress={handleLogoutPress}>
         <Text style={styles.destinationText}>Log Out  :  </Text>
         <Animated.View style={[styles.iconContainer, { marginLeft: moveAnimation }]}>
@@ -109,4 +78,4 @@ function HomeSearch() {
   );
 }
 
-export default HomeSearch;
+export default LogOut;

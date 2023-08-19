@@ -44,7 +44,7 @@ const SignUp = () => {
   const [number, setNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const group = 'CUSTOMER';
+  const group = 'DRIVER';
 
   const navigation = useNavigation();
 

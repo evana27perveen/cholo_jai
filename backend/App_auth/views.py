@@ -28,7 +28,10 @@ class RegisterAPIView(CreateAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializers_ = self.get_serializer(data=request.data, context={"groups": request.data['group']})
+        serializers_ = self.get_serializer(data=request.data, context={"groups": request.data['group'],
+                                                                       "full_name": request.data['full_name'],
+                                                                       "phone_number": request.data['phone_number']
+                                                                       })
         if serializers_.is_valid():
             self.perform_create(serializers_)
             return Response(serializers_.data, status=status.HTTP_201_CREATED)
@@ -83,18 +86,12 @@ class UserLoginView(TokenObtainPairView):
             refreshToken = RefreshToken.for_user(user)
             grp = groups = Group.objects.filter(user=user)
             group_names = [group.name for group in groups][0]
-            profile = ProfileModel.objects.get(user=user)
-            if profile.phone_number is None:
-                profile_status = False
-            else:
-                profile_status = True
 
             return Response({
                 'refreshToken': str(refreshToken),
                 'accessToken': str(refreshToken.access_token),
                 'alert': 'Login Success',
                 'group': group_names,
-                'profile': str(profile_status)
             }, status=status.HTTP_200_OK)
         else:
             return Response({"alert": "Failed!"}, status=status.HTTP_404_NOT_FOUND)

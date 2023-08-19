@@ -26,6 +26,7 @@ class RideModel(models.Model):
         ('On Ride', 'On Ride'),
         ('Completed', 'Completed'),
         ('Canceled', 'Canceled'),
+        ('Payment Done', 'Payment Done'),
     )
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='passenger')
     user_cords_lat = models.CharField(max_length=300, blank=True, null=True)
@@ -45,7 +46,8 @@ class RideModel(models.Model):
     
     class Meta:
         ordering = ['-date']
-        
+
+
 class TransactionModel(models.Model):
     ride = models.ForeignKey(RideModel, on_delete=models.CASCADE, related_name='payment')
     payment_method = models.CharField(max_length=50, default='cash')

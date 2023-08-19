@@ -49,7 +49,6 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [token, setToken] = useCookies(['myToken']);
     const [group, setGroup] = useCookies(['myGroup']);
-    const [profile, setProfile] = useCookies(['myProfile']);
     const navigation = useNavigation();
 
     const handleSignUp = async (e) => {
@@ -95,9 +94,8 @@ const Login = () => {
           console.log('success', jsonResponse);
           setToken("access_token", jsonResponse.accessToken)
           setGroup("group", jsonResponse.group)
-          setProfile("profile", jsonResponse.profile)
-          if (jsonResponse.profile === "False") {
-            navigation.navigate('Profile');
+          if (jsonResponse.group === "DRIVER") {
+            navigation.navigate('DriverHome');
           }
           else {
             navigation.navigate('Home');
@@ -116,7 +114,7 @@ const Login = () => {
   return (
     <View style={styles.container}>
         <Image source={require('../../../assets/images/logoC.png')}
-        style={{ width: 400, height: 300, resizeMode: 'contain' }}/>
+        style={{ width: 320, height: 220, resizeMode: 'contain' }}/>
       <Text style={styles.title}>Login</Text>
 <View style={styles.inputContainer}>
 <TextInput
