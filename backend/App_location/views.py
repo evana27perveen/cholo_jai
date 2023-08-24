@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 
 from App_auth.models import DriverModel
-from .models import CurrentLocationModel, RideModel, TransactionModel
+from .models import CurrentLocationModel, RideModel, TransactionModel, FeedBackModel
 from .serializers import CurrentLocationSerializer, RideModelSerializer, TransactionModelSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -41,6 +41,9 @@ class RideListCreateView(generics.ListCreateAPIView):
         
         transaction = TransactionModel.objects.create(ride=serializer.instance, amount=serializer.instance.cost)
         transaction.save()
+
+        feed = FeedBackModel.objects.create(ride=serializer.instance)
+        feed.save()
         
         headers = self.get_success_headers(serializer.data)
         response_data = {
@@ -59,7 +62,6 @@ class RideRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
 
 class TransactionModelRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = TransactionModel.objects.all()
@@ -109,3 +111,27 @@ class DriverRideListView(generics.ListCreateAPIView):
     def get_queryset(self):
         driver = DriverModel.objects.get(user=self.request.user)
         return RideModel.objects.filter(driver=driver)
+
+
+class FeedBackAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        ride_id = kwargs['ride_id']
+        ride = RideModel.objects.get(pk=ride_id)
+
+        feed = FeedBackModel.objects.get(ride=ride)
+
+        rating = request.data['_parts'][0][1]
+        complain = request.data['_parts'][1][1]
+
+        if rating is not None:
+            feed.rating = rating
+        if complain is not None:
+            feed.complain = complain
+
+        feed.save()
+
+        print(feed)
+
+        return Response(status=status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 from django.urls import path
 from App_auth.views import *
 from .views import CurrentLocationUpdateView, RideListCreateView, RideRetrieveUpdateDeleteView, \
-    TransactionModelRetrieveUpdateView, RequestsAPIView, AcceptsAPIView, DriverRideListView
+    TransactionModelRetrieveUpdateView, RequestsAPIView, AcceptsAPIView, DriverRideListView, FeedBackAPIView
 
 app_name = 'App_location'
 
@@ -15,4 +15,5 @@ urlpatterns = [
          name='payment'),
     path('requests/', RequestsAPIView.as_view(), name='requests'),
     path('accepts/<int:ride_id>/', AcceptsAPIView.as_view(), name='accepts'),
+    path('feed-back/<int:ride_id>/', FeedBackAPIView.as_view(), name='feed-back'),
 ]

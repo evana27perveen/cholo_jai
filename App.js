@@ -16,6 +16,7 @@ import DriverHome from './src/screens/HomeScreen/DriverHome';
 import RideRequest from './src/components/RideFind/RideRequest';
 import Payment from './src/components/RideFind/Payment';
 import RideDetails from './src/components/RideFind/RideDetails';
+import FeedBack from './src/components/RideFind/FeedBack';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,7 @@ export default function App() {
           <Stack.Screen name="RideRequest" component={RideRequest} options={{ headerShown: false }} />
           <Stack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
           <Stack.Screen name="RideDetails" component={RideDetails} options={{ headerShown: false }} />
+          <Stack.Screen name="FeedBack" component={FeedBack} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

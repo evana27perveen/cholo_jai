@@ -84,7 +84,7 @@ const Payment = ({ route }) => {
         });
           if (response.ok) {
             console.log('Payment Successful !!!');
-            navigation.navigate('Home');
+            navigation.navigate('FeedBack', { rideID: rideID });
 
           } else {
             console.error('Payment Failed !!');
@@ -103,14 +103,14 @@ const Payment = ({ route }) => {
             <View style={styles.content}>
                 {isBkashCard1Visible && (
                     <View style={styles.bkashCard}>
-                        <Image source={require('../../../assets/images/gate1.png')} style={styles.logo} />
+                        
                         <View style={styles.textCard}>
                             <Text style={styles.text}>Merchant: cably.com</Text>
                             <Text style={styles.text}>Date: {fullDate}</Text>
                             <Text style={styles.text}>Amount: {amount}</Text>
                         </View>
                         <View style={styles.textInputCard}>
-                            <Text style={styles.text}>Your Bkash Account Number</Text>
+                            <Text style={styles.text}>Your Wallet Number</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="e.g 01XXXXXXXXX"
@@ -120,7 +120,7 @@ const Payment = ({ route }) => {
                                 keyboardType="numeric"
                             />
                             <View style={styles.checkboxContainer}>
-                                <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} color={isChecked ? "#cf045c" : undefined}/>
+                                <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} color={isChecked ? '#411e69' : undefined}/>
                                 <Text style={styles.termsText}>
                                     I agree to the 
                                     <Text style={styles.termsLink}> terms and conditions</Text>
@@ -139,7 +139,6 @@ const Payment = ({ route }) => {
                 )}
                 {isBkashCard2Visible && (
                     <View style={styles.bkashCard}>
-                        <Image source={require('../../../assets/images/gate1.png')} style={styles.logo} />
                         
                         <View style={styles.textInputCard}>
                             <Text style={styles.text}>Enter PIN</Text>
@@ -156,7 +155,7 @@ const Payment = ({ route }) => {
                             
                             <View style={styles.buttonsContainer2}>
                                 <TouchableOpacity style={styles.button2} onPress={handlePin} >
-                                  <Image source={require('../../../assets/images/btn2_logo.png')} style={styles.buttonImage} />
+                                  <Text style={styles.buttonText}>Submit</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.button2} onPress={() => {navigation.navigate('Home');}}>
                                     <Text style={styles.buttonText}>CLOSE</Text>
@@ -166,12 +165,9 @@ const Payment = ({ route }) => {
                     </View>
                 )}
                 {isBkashCard3Visible && (
-                    
                     <View style={styles.bkashCard}>
-                        <Image source={require('../../../assets/images/gate1.png')} style={styles.logo} />
 
                         <View style={styles.textInputCard}>
-                            {/* Animation */}
                             <View style={styles.progressBarContainer}>
                                 <Animated.View
                                     style={[styles.progressBar, { transform: [{ scaleX: animationProgress }] }]}
@@ -210,7 +206,7 @@ logo: {
     marginBottom: 15,
 },
 bkashCard: {
-    backgroundColor: '#e2136e',
+    backgroundColor: '#9951ec',
     paddingVertical: 10,
     borderRadius: 3,
     marginVertical: 10,
@@ -223,9 +219,11 @@ bkashCard: {
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
+    paddingTop: 20,
+    borderWidth: 1,
 },
 textCard: {
-    backgroundColor: '#e2136e', 
+    backgroundColor: '#9951ec', 
     paddingVertical: 10,
     borderRadius: 3,
     width: '85%',
@@ -240,7 +238,7 @@ textCard: {
     marginBottom: 10,
 },
 textInputCard: {
-    backgroundColor: '#e2136e',
+    backgroundColor: '#9951ec',
     paddingVertical: 10,
     width: '85%',
     alignItems: 'center',
@@ -293,7 +291,7 @@ buttonsContainer2: {
   marginBottom: 5,
 },
 button: {
-    backgroundColor: '#c22e6e',
+    backgroundColor: '#481a7c',
     paddingVertical: 10,
     paddingHorizontal: 20,
     justifyContent: 'space-between',
@@ -304,7 +302,7 @@ button: {
     borderColor: '#fcf6f6',
 },
 button2: {
-  backgroundColor: '#c22e6e',
+  backgroundColor: '#411e69',
   paddingVertical: 10,
   paddingHorizontal: 20,
   justifyContent: 'space-between',
@@ -347,7 +345,7 @@ buttonImage: {
 progressBarContainer: {
   width: '100%',
   height: 12,
-  backgroundColor: '#e2136e',
+  backgroundColor: '#9951ec',
   borderRadius: 5,
   overflow: 'hidden',
   marginBottom: 15,

@@ -60,3 +60,13 @@ class TransactionModel(models.Model):
     
     class Meta:
         ordering = ['-payment_date']
+
+
+class FeedBackModel(models.Model):
+    ride = models.ForeignKey(RideModel, on_delete=models.CASCADE, related_name='feed')
+    rating = models.CharField(max_length=10, blank=True, null=True)
+    complain = models.TextField(blank=True, null=True)
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.ride.user.email}'s rating is - {self.rating} on {self.datetime}"

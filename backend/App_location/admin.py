@@ -6,3 +6,4 @@ from App_location.models import *
 admin.site.register(CurrentLocationModel)
 admin.site.register(RideModel)
 admin.site.register(TransactionModel)
+admin.site.register(FeedBackModel)
